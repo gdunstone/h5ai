@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM --platform=$BUILDPLATFORM alpine:latest
 LABEL Maintainer="kekel87 <https://github.com/kekel87>" \
       Description="Lightweight container with Nginx 1.10 & PHP-FPM 7.1 based on Alpine Linux."
 
@@ -10,7 +10,7 @@ ENV HTTPD_USER www-data
 
 COPY class-setup.php.patch class-setup.php.patch
 
-# Install packages from testing repo's
+# these packages are in stable repos now
 RUN apk add --no-cache --virtual .build-deps \
     unzip \
     openssl \
@@ -31,8 +31,6 @@ RUN apk add --no-cache --virtual .build-deps \
     acl \
     ffmpeg \
     imagemagick \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/ \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
 
  # Install packages from stable repo's
  && apk --no-cache add supervisor curl \
