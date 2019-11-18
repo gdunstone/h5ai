@@ -1,4 +1,3 @@
-ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM alpine:latest
 RUN echo "building on $BUILDPLATFORM for $TARGETPLATFORM"
 
