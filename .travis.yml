@@ -22,8 +22,6 @@ before_install:
   - /tmp/scripts.sh update_docker
 
 stages:
-  - name: build amd64
-    if: branch != master AND tag IS blank
   - name: build and deploy master
     if: branch = master AND tag IS blank
   - name: build and deploy a version

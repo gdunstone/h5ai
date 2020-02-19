@@ -10,6 +10,9 @@ ARG IMAGICK_EXT_VERSION=3.4.2
 ARG H5AI_VERSION=0.29.0
 
 ENV HTTPD_USER www-data
+RUN deluser xfs && \
+    addgroup -g 33 ${HTTPD_USER} && \
+    adduser -H -s /sbin/nologin -S -u 33 -G ${HTTPD_USER} ${HTTPD_USER}
 
 COPY class-setup.php.patch class-setup.php.patch
 
@@ -19,8 +22,11 @@ RUN apk add --no-cache --virtual .build-deps \
     openssl \
     ca-certificates \
     wget \
-    patch \
- && apk --no-cache add \
+    patch
+
+ # Install packages from stable repo's
+RUN apk --no-cache add \
+    supervisor curl \
     nginx \
     php7-mbstring \
     php7-fpm \
@@ -33,21 +39,16 @@ RUN apk add --no-cache --virtual .build-deps \
     zip \
     acl \
     ffmpeg \
-    imagemagick \
-
- # Install packages from stable repo's
- && apk --no-cache add supervisor curl \
+    imagemagick
 
  # Install h5ai
- && wget --no-check-certificate  https://release.larsjung.de/h5ai/h5ai-${H5AI_VERSION}.zip -P /tmp \
- && unzip /tmp/h5ai-${H5AI_VERSION}.zip -d /usr/share/h5ai \
+ # and patch h5ai because we want to deploy it ouside of the document root and use /var/www as root for browsing
 
-# patch h5ai because we want to deploy it ouside of the document root and use /var/www as root for browsing
-
- && patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core/ -i /class-setup.php.patch \
+ RUN wget --no-check-certificate  https://release.larsjung.de/h5ai/h5ai-${H5AI_VERSION}.zip -P /tmp \
+    && unzip /tmp/h5ai-${H5AI_VERSION}.zip -d /usr/share/h5ai \
+    && patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core/ -i /class-setup.php.patch
  
- # Clean php7-pear php7-dev
- && apk del .build-deps \
+RUN apk del .build-deps \
  && rm -rf /var/cache/apk/* /tmp/* /class-setup.php.patch
 
 # Configure H5AI
