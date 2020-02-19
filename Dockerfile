@@ -1,6 +1,4 @@
-ARG TARGETPLATFORM
 FROM --platform=$TARGETPLATFORM alpine:latest
-RUN echo "building on $BUILDPLATFORM for $TARGETPLATFORM"
 
 LABEL Maintainer="kekel87 <https://github.com/kekel87>" \
       Description="Lightweight container with Nginx 1.10 & PHP-FPM 7.1 based on Alpine Linux."
